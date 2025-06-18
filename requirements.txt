@@ -1,0 +1,6 @@
+fastapi
+fastapi-mcp
+uvicorn
+mcp-proxy
+python-dotenv
+httpx
