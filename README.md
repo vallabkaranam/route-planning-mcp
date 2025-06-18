@@ -1,140 +1,167 @@
-# 🧭 Route Planning MCP
+# 🗺️ Route Planning MCP Tool Server
 
-A modular, LLM-ready microservice designed for intelligent agents and frontend clients alike. This backend system supports geocoding, route planning, mountain discovery, and EV charger lookup—leveraging fast, structured APIs tailored for use by both humans and machines.
+A modern, production-grade API service designed for both traditional frontends and LLM-based agents. This backend system empowers AI agents to plan trips, geocode locations, search nearby mountains, and find EV chargers—using a lightweight, type-safe FastAPI backend that’s fully compliant with the Model Context Protocol (MCP).
 
-🔗 [Live API Docs](https://route-planning-mcp.onrender.com/docs)
+**Live MCP Server**: [https://route-planning-mcp.onrender.com](https://route-planning-mcp.onrender.com)
 
 ---
 
 ## ✨ Key Features
 
-- 📍 **Geocoding**
+- 🌍 **Geolocation & Mapping Intelligence**
 
-  - Converts location text into precise coordinates using OpenStreetMap Nominatim API.
+  - Geocodes human-readable locations to lat/lon using OpenStreetMap Nominatim
+  - Fetches optimized driving routes via OpenRouteService
+  - Calculates ETA and distance summaries
+  - Includes landmark & terrain context: mountain peak lookup via Overpass API
 
-- 🛣️ **Route Planning**
+- ⚡ **Nearby EV Infrastructure**
 
-  - Plans optimal routes with distance, duration, step-by-step instructions, and estimated arrival times using OpenRouteService.
+  - Local, statically indexed EV charger data
+  - Fast Haversine-filtered spatial queries for chargers by radius
 
-- 🏔️ **Mountain Discovery**
+- 🧠 **LLM-Friendly & MCP-Compliant**
 
-  - Finds named and unnamed peaks around a location using Overpass API.
+  - Built with [`fastapi-mcp`](https://github.com/multion/fastapi-mcp) to conform to Model Context Protocol (MCP)
+  - Semantic errors (e.g., `LOCATION_NOT_FOUND`, `ORS_API_FAILED`)
+  - Type-safe responses for seamless tool discovery and reasoning in agents
 
-- 🔌 **EV Charger Lookup**
+- 🛠️ **Tool & pipeline orchestration**  
+  Showcases real-world **agent tooling primitives** — geocoding, routing, environmental context — that form the building blocks of **RAG**, **vector memory**, and **multi-tool workflows**
 
-  - Identifies nearby Tesla Superchargers from curated static data using Haversine distance.
+- 🚀 **AI-First Architecture & Agentic Systems**
 
-- 🤖 **LLM + MCP Integration**
+  - Demonstrates how to build an **MCP-compliant tool server** to enable **multi-step LLM reasoning**
+  - Useful for **LLMOps**, **AI Platform Engineering**, and **Agent-Oriented Design** portfolios
 
-  - Full support for Claude-compatible agents via `fastapi-mcp`, exposing agent-friendly tool schemas with typed responses.
-
-- ⚡ **Production-Ready**
-  - Typed Pydantic schemas, HTTPX async calls, FastAPI for blazing-fast performance, and a clean architecture.
+- 📐 **Type-Safe, Structured API Design**
+  - Uses FastAPI + Pydantic `response_model`s
+  - Semantic error handling
+  - Fully OpenAPI-documented with Swagger UI
+  - Ideal for toolchains like **LangChain**, **LangGraph**, and **Claude tool use**
 
 ---
 
 ## 🛠️ Tech Stack
 
 - **Framework**: FastAPI (Python 3.11+)
-- **Async Client**: HTTPX
-- **MCP Toolkit**: `fastapi-mcp` (Claude-compatible)
-- **Model Validation**: Pydantic
-- **Geocoding API**: OpenStreetMap (Nominatim)
-- **Routing API**: OpenRouteService (ORS)
-- **Geospatial Query**: Overpass API
-- **Deployment**: Render (Free Tier)
-- **Environment Config**: python-dotenv
-- **Serialization**: JSON (for both AI agents and frontend clients)
+- **Async HTTP Client**: `httpx`
+- **Data Modeling**: Pydantic
+- **Protocol**: [`fastapi-mcp`](https://github.com/multion/fastapi-mcp)
+- **Environment Management**: `python-dotenv`
+- **Deployment**: [Render](https://render.com/) (Free-tier, stateless)
+- **Geocoding**: OpenStreetMap Nominatim
+- **Routing**: OpenRouteService API
+- **Terrain Data**: Overpass API (OpenStreetMap)
+- **EV Charger Data**: Supercharge.info static JSON
 
 ---
 
-## 🚀 Deployment
+## 🚀 Getting Started (Local Development)
 
-### 🌐 Live URL
-
-```
-https://route-planning-mcp.onrender.com
-```
-
-### 🧠 Claude Desktop Integration
-
-In your `mcp-config.json`, add:
-
-```json
-{
-  "mcpServers": {
-    "route-planning-mcp": {
-      "command": "/path/to/mcp-proxy",
-      "args": ["https://route-planning-mcp.onrender.com/mcp"],
-      "cwd": "/local/project/path",
-      "env": {}
-    }
-  }
-}
-```
-
----
-
-## 🧪 Local Development
-
-### Prerequisites
-
-- Python 3.11+
-- `venv`
-- OpenRouteService API key (free tier is fine)
-- `.env` file with:
-  ```env
-  ORS_API_KEY=your_api_key_here
-  ```
-
-### Setup
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/yourusername/route-planning-mcp.git
 cd route-planning-mcp
+```
 
+### 2. Create and Activate Virtual Environment
+
+```bash
 python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
+### 3. Install Dependencies
+
+```bash
 pip install -r requirements.txt
+```
+
+### 4. Set Up Environment Variables
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` to include your OpenRouteService API key:
+
+```env
+ORS_API_KEY=your_openrouteservice_key_here
+```
+
+### 5. Run the Server
+
+```bash
 uvicorn main:app --reload
 ```
 
-### Example Test
+### 6. Test API
 
-```bash
-curl -X POST http://localhost:8000/geocode_location \
-  -H "Content-Type: application/json" \
-  -d '{"location_text": "Seattle, WA"}'
-```
+Visit Swagger UI at:  
+[http://localhost:8000/docs](http://localhost:8000/docs)
 
 ---
 
-## 📂 Project Structure
+## ☁️ Deployment (Render)
 
-```
-route-planning-mcp/
-├── main.py              # Core FastAPI server and endpoints
-├── ev_chargers.json     # Static EV charger database
-├── .env                 # Contains ORS_API_KEY
-├── requirements.txt     # All dependencies
-└── README.md            # Project documentation
-```
+Deployed to:  
+👉 https://route-planning-mcp.onrender.com
+
+- Render used for interim free-tier deployment
+- MCP tool server hosted publicly for LLMs like Claude
+- Fast cold start and stateless HTTP design
+- No ALB or RDS required — ultra-lightweight cost footprint
 
 ---
 
 ## 📈 Why This Project Stands Out
 
-This microservice showcases:
+- 🔗 **Model Context Protocol (MCP) Expertise**
 
-- ✅ **End-to-End Backend Engineering**: From API integration to async architecture and response typing.
-- 🤖 **LLM and AI Tool Integration**: Shows readiness for modern agent ecosystems like Claude.
-- 📦 **Microservice Modularity**: Encapsulated, stateless service with a single responsibility—ideal for scaling and service-oriented architecture.
-- 💬 **Human & Machine Friendly**: Clear OpenAPI documentation for humans and structured tool specs for LLMs.
-- 🏗️ **Deployment Experience**: Deployable to modern cloud platforms like Render and AWS with environment management.
+  - Demonstrates understanding of **agent-tool standards** for interoperable AI tooling
+  - Emerging pattern for **Claude, GPT, LangGraph, and OpenAgents** use cases
+
+- 🛠️ **Tool Composition & Multi-Tool Reasoning**
+
+  - Real-world example of tools that support geospatial reasoning
+  - Aligns with modern trends in **AI agent orchestration**, **RAG**, and **LLM tool-use**
+
+- 📐 **LLM-Ready, Semantic API Design**
+
+  - Uses typed, structured responses for **tool discovery** and **LLM reasoning**
+  - Robust error reporting supports fallback chains in **multi-agent** workflows
+
+- ☁️ **DevOps Simplicity**
+  - Stateless API deployed on free-tier Render
+  - Easy CI/CD pipeline potential
+  - Portable and extensible to ECS, Fargate, Lambda, or Fly.io
+
+---
+
+## 📁 Project Structure
+
+```
+route-planning-mcp/
+├── main.py               # FastAPI app with MCP server logic
+├── ev_chargers.json      # Static EV charger dataset (Supercharge.info)
+├── .env.example          # Environment variable template
+├── requirements.txt      # Python dependencies
+└── README.md             # Project documentation
+```
+
+---
+
+## 🧪 Example Use Cases
+
+- Claude Desktop tool connection via MCP
+- Trip planner assistant with multimodal steps
+- AI agent choosing route based on charger availability
+- LangGraph node for geospatial lookup and planning
 
 ---
 
 ## 📝 License
 
-MIT License — use, remix, and extend freely.
+MIT License – Free to use and adapt. Attribution appreciated!
