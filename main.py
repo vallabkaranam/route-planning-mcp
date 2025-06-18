@@ -175,7 +175,7 @@ async def search_mountains(request: MountainSearchRequest):
             for el in elements if "lat" in el and "lon" in el
         ]
 
-        return peaks[:3]
+        return peaks[:3]  # Return top 3
 
     except Exception as e:
         raise HTTPException(status_code=500, detail={"error": "MOUNTAIN_SEARCH_FAILED", "message": str(e)})
